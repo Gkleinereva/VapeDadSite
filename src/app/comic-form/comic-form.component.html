@@ -1,0 +1,53 @@
+<h3>Comic Details</h3>
+<div>
+	
+	<!-- Put our form fields in a formgroup -->
+	<!-- Also dictates what happens when the form is submitted -->
+	<form [formGroup]="comicForm" (ngSubmit)="onSubmit()">
+		<!-- the form-group class comes from bootstrap and adds styling -->
+		<div class="form-group">
+			<label class="center-block">Comic Number:
+				<!-- the 'formControl' field refers to the field defined in the class -->
+				<!-- Note that we now use the formControlName attribute since this is in a form group -->
+				<input class="form-control" formControlName="comicNum" /> 
+			</label>
+			<label class="center-block">Release Date: 
+				<input class="form-control" formControlName="releaseDate" /> 
+			</label>
+		</div>
+
+		<div formGroupName="images" class="well well-lg">
+			<div *ngFor="let address of images.controls; let i=index" [formGroupName]="i">
+				<h4>Image #{{i + 1}}</h4>
+				<div class="form-group">
+					<label class="center-block">Image: 
+						<input type="file" class="form-control" formControlName="image" (change)="fileChanged($event, i)">
+						<!-- Needs type of 'button' to prevent it from defaulting to 'submit' and sending the whole form -->
+						<button type="button" class="btn btn-success" (click)="upload()">Upload!</button>
+					</label>
+					<label class="center-block">Locations: 
+						<input class="form-control" formControlName="locations">
+					</label>
+				</div>
+			</div>
+			<!-- This button calls a function to add an image to our form group -->
+			<button (click)="addImage()" type="button">Add an Image</button>
+		</div>
+		<div style="margin-bottom: 1em">
+			<!-- Button to submit the updated form data -->
+			<!-- This calls the forms onSubmit() method automatically -->
+			<!-- The [disabled]... disables the button until the user changes form data -->
+			<button type="submit" [disabled]="comicForm.pristine" class="btn btn-success">Save</button> &nbsp;
+		</div>
+	</form>
+
+
+
+	<!-- Displays the resulting JSON in response to form entry -->
+	<p>Form Value: {{comicForm.value | json}} </p>
+	<!-- Let's us know if the current entered form is valid -->
+	<p>Form status: {{ comicForm.status | json }}</p>
+	<!-- You can extract specific values from the form like this -->
+	<p>Comic Number: {{comicForm.get('comicNum').value}}</p>
+
+</div>
