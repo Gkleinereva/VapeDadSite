@@ -3,9 +3,16 @@ export class Comic {
 	comicNum = 0;
 	releaseDate = '';
 	images: Image[];
+	imageData: ImageData[];
 }
 
 export class Image {
-	image = '';
+	image= '';
 	locations = '';
+}
+
+export class ImageData {
+	filename = '';
+	filetype = '';
+	value = '';
 }

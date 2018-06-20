@@ -1,7 +1,6 @@
 var fs = require('fs');
 
 exports.AddComic = function(req, res, next) {
-	console.log(req.body);
 
 	let comicDir = "comic_data/" + req.body.comicNum;
 	
@@ -27,8 +26,8 @@ exports.AddComic = function(req, res, next) {
 		
 		// First write the file to disk
 		fs.writeFile(
-			comicDir + "/" + req.body.images[imageIndex].image.filename, 
-			req.body.images[imageIndex].image.value, 
+			comicDir + "/" + req.body.imageData[imageIndex].filename, 
+			req.body.imageData[imageIndex].value, 
 			'base64', 
 			function(err) {
 				console.log(err);
@@ -36,22 +35,22 @@ exports.AddComic = function(req, res, next) {
 		);
 
 		// Next write the fileNames and Locations to the schemaObject
-		// schemaObject.images.push({});
-		// schemaObject.images[imageIndex].filename = req.body.images[imageIndex].image.filename;
-		// schemaObject.images[imageIndex].locations = req.body.images[imageIndex].locations.split(',');
+		schemaObject.images.push({});
+		schemaObject.images[imageIndex].filename = req.body.imageData[imageIndex].filename;
+		schemaObject.images[imageIndex].locations = req.body.images[imageIndex].locations.split(',');
 
 		imageIndex++;
 	}
 
 	// Finally, write our schemaObject to file
-	// fs.writeFile(
-	// 	comicDir + "/" + "schema.json",
-	// 	JSON.stringify(schemaObject),
-	// 	function(err) {
-	// 		console.log(err);
-	// 	}
-	// );
+	fs.writeFile(
+		comicDir + "/" + "schema.json",
+		JSON.stringify(schemaObject),
+		function(err) {
+			console.log(err);
+		}
+	);
 
-	res.end();
-	//res.redirect("/admin");
+	// Redirect the user to the admin site
+	res.redirect("/admin");
 }

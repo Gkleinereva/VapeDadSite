@@ -7,7 +7,7 @@ import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ComicService} from '../comic.service';
 
 //Import our comic and image classes
-import {Comic, Image} from '../comic';
+import {Comic, Image, ImageData } from '../comic';
 
 @Component({
 	selector: 'app-comic-form',
@@ -21,6 +21,8 @@ export class ComicFormComponent implements OnChanges {
 	@Input() comic: Comic;
 	
 	comicForm: FormGroup; // <--- heroForm is of type FormGroup
+
+	imageDataArray: ImageData[] = [];
 
 	// Updated to be the user's selected file whenever the user changes a file in the menus
 	selectedFile: File;
@@ -66,11 +68,10 @@ export class ComicFormComponent implements OnChanges {
 			reader.readAsDataURL(file);
 			reader.onload = () => {
 				console.log(this.comicForm.get('images'));
-				this.comicForm.get('images').value[arrayIndex].image = {
-					filename: file.name,
-					filetype: file.type,
-					value: reader.result.split(',')[1]
-				};
+				this.imageDataArray[arrayIndex] = new ImageData;
+				this.imageDataArray[arrayIndex].filename = file.name;
+				this.imageDataArray[arrayIndex].filetype = file.type;
+				this.imageDataArray[arrayIndex].value = reader.result.split(',')[1];
 			};
 		}
 	}
@@ -97,6 +98,7 @@ export class ComicFormComponent implements OnChanges {
 
 	// Compiles form data into the comic object for us to send to the server
 	prepareSaveComic() {
+
 		const formModel = this.comicForm.value;
 
 		// Makes copies of the Image objects so that subsequent changes won't mess with the existing data
@@ -117,7 +119,8 @@ export class ComicFormComponent implements OnChanges {
 			id: comicId,
 			comicNum: formModel.comicNum as number,
 			releaseDate: formModel.releaseDate,
-			images: imagesDeepCopy
+			images: imagesDeepCopy,
+			imageData: this.imageDataArray
 		};
 
 		return saveComic;

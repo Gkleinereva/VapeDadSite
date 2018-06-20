@@ -17,7 +17,7 @@
 		</div>
 
 		<div formArrayName="images" class="well well-lg">
-			<div *ngFor="let address of images.controls; let i=index" [formGroupName]="i">
+			<div *ngFor="let image of images.controls; let i=index" [formGroupName]="i">
 				<h4>Image #{{i + 1}}</h4>
 				<div class="form-group">
 					<label class="center-block">Image: 
