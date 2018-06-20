@@ -58,7 +58,20 @@ export class ComicFormComponent implements OnChanges {
 
 	// Called whenever a user changes a file in a form field
 	fileChanged(event, arrayIndex) {
-		this.selectedFile = event.target.files[0];
+		console.log(arrayIndex);
+		let reader = new FileReader();
+		if(event.target.files && event.target.files.length > 0) {
+			let file = event.target.files[0];
+			reader.readAsDataURL(file);
+			reader.onload = () => {
+				console.log(this.comicForm.get('images'));
+				this.comicForm.get('images').value[arrayIndex].image = {
+					filename: file.name,
+					filetype: file.type,
+					value: reader.result.split(',')[1]
+				};
+			};
+		}
 	}
 
 	// Called when the user presses the upload button to send a file to the server

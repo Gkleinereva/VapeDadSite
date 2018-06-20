@@ -3,21 +3,14 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
 
-// Required middleware to work with file upload
-const busboy = require('connect-busboy');
-const fs = require('fs-extra');
-
 // Routes
 const api = require('./server/routes/api');
 
 const app = express();
 
 // Parsers
-// app.use(bodyParser.json({limit: '50mb'}));
-// app.use(bodyParser.urlencoded({limit:'50mb', extended: true}));
-
-// Middleware for parsing file uploads
-app.use(busboy());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit:'50mb', extended: true}));
 
 // Angular DIST output folder
 app.use(express.static(path.join(__dirname, 'dist/VapeDad')));
