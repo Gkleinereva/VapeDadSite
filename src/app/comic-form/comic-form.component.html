@@ -16,7 +16,7 @@
 			</label>
 		</div>
 
-		<div formGroupName="images" class="well well-lg">
+		<div formArrayName="images" class="well well-lg">
 			<div *ngFor="let address of images.controls; let i=index" [formGroupName]="i">
 				<h4>Image #{{i + 1}}</h4>
 				<div class="form-group">
@@ -25,6 +25,8 @@
 						<!-- Needs type of 'button' to prevent it from defaulting to 'submit' and sending the whole form -->
 						<!-- <button type="button" class="btn btn-success" (click)="upload()">Upload!</button> -->
 					</label>
+				</div>
+				<div class="form-group">
 					<label class="center-block">Locations: 
 						<input class="form-control" formControlName="locations">
 					</label>

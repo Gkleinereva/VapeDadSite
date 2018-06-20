@@ -7,5 +7,5 @@ export class Comic {
 
 export class Image {
 	image = '';
-	locations = [];
+	locations = '';
 }

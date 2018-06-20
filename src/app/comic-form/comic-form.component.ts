@@ -60,6 +60,7 @@ export class ComicFormComponent implements OnChanges {
 	fileChanged(event, arrayIndex) {
 		console.log(arrayIndex);
 		let reader = new FileReader();
+		console.log(event.target.files[0]);
 		if(event.target.files && event.target.files.length > 0) {
 			let file = event.target.files[0];
 			reader.readAsDataURL(file);
