@@ -1,3 +1,4 @@
+// Required Module for filesystem operations
 var fs = require('fs');
 
 exports.AddComic = function(req, res, next) {
@@ -32,7 +33,7 @@ exports.AddComic = function(req, res, next) {
 			function(err) {
 				console.log(err);
 			}
-		);
+			);
 
 		// Next write the fileNames and Locations to the schemaObject
 		schemaObject.images.push({});
@@ -48,9 +49,97 @@ exports.AddComic = function(req, res, next) {
 		JSON.stringify(schemaObject),
 		function(err) {
 			console.log(err);
-		}
-	);
 
-	// Redirect the user to the admin site
-	res.redirect("/admin");
+			// Write HTML snippet as soon as schema file exists
+			CompileHtml(req);
+		}
+		);
+
+	// End the response; handle redirect on Angular side
+	res.end();
 }
+
+// Helper function to compile the html snippet that will be sent to Angular to display the comic
+function CompileHtml(request) {
+	let schema = {};
+	
+	// Read in the schema file that we just created
+	fs.readFile("comic_data/" + request.body.comicNum + "/schema.json", 'utf8', (err, data) => {
+		if(err) return console.log(err);
+
+		console.log(data);
+	});
+}
+
+exports.compileTest = function(comicNum) {
+	console.log("here");
+
+	fs.readFile("../../comic_data/" + comicNum + "/schema.json", 'utf8', (err, data) => {
+		if(err) {
+			return console.log(err)
+		}
+
+		console.log(data);
+
+			// Parse our data string into JSON
+			data = JSON.parse(data);
+
+			//String to hold our HTML output
+			let html = '';
+
+			// The dimension we want the images to be
+			let imgDims = 300;
+
+			let imageIndex = 0;
+			let locationIndex = 0;
+			while(imageIndex < data.images.length) {
+				
+				// First add an opening <img> tag
+				html += '<img style="';
+
+				// Handle the case where we're only filling 1 block
+				if(data.images[imageIndex].locations.length == 1) {
+					html += 'width:' + imgDims + 'px;height:' + imgDims + 'px;';
+					html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
+					html += 'top:' + imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 'px;"';
+				}
+
+				// Handle the case where we have multiple blocks
+				else {
+
+					// Blocks are in a row
+					if(parseInt(data.images[imageIndex].locations[0]) + 1 ==  parseInt(data.images[imageIndex].locations[1])) {
+						html += 'width:' + imgDims*data.images[imageIndex].locations.length + 'px;height:' + imgDims + 'px;';
+						html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
+						html += 'top:' + imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 'px;"';
+					}
+
+					else {
+						html += 'width:' + imgDims + 'px;height:' + imgDims*data.images[imageIndex].locations.length + 'px;';
+						html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
+						html += 'top:' + imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 'px;"';
+					}
+				}
+
+				html += ' src="/' + comicNum + '/' + data.images[imageIndex].filename + '">';
+
+				imageIndex++;
+			}
+
+			// Finally, write our schemaObject to file
+			fs.writeFile(
+				"../../comic_data/" + comicNum + "/" + "comic.html",
+				html,
+				function(err) {
+					console.log(err);
+
+				}
+				);
+
+			console.log(html);
+
+	});
+}
+
+//Module used for testing
+var runnable = require('make-runnable');

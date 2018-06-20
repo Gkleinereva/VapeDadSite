@@ -1,15 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-comic',
-  templateUrl: './comic.component.html',
-  styleUrls: ['./comic.component.css']
+	selector: 'app-comic',
+	templateUrl: './comic.component.html',
+	styleUrls: ['./comic.component.css']
 })
 export class ComicComponent implements OnInit {
 
-  constructor() { }
+	// Contains the html snippet delivered by the API for the current comic
+	html: string;
 
-  ngOnInit() {
-  }
+	constructor() { }
+
+	ngOnInit() {
+		this.getLatest();
+	}
+
+	// Gets the most recent comic for display
+	getLatest(): void {
+
+	}
 
 }
