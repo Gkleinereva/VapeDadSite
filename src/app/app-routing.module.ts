@@ -7,6 +7,7 @@ const routes: Routes = [
 	{path: 'admin', component: AdminComponent},
 	{path: 'main', component: MenuComponent},
 	{path: '', redirectTo: '/main', pathMatch: 'full'},
+	{path: 'comic/:comicNum', component: MenuComponent}
 ];
 
 @NgModule({

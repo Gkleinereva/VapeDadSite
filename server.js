@@ -16,6 +16,9 @@ app.use(bodyParser.urlencoded({limit:'50mb', extended: true}));
 // Angular DIST output folder
 app.use(express.static(path.join(__dirname, 'dist/VapeDad')));
 
+// Comic Files
+app.use(express.static(path.join(__dirname, 'comic_data')));
+
 // API location
 app.use('/api', api);
 

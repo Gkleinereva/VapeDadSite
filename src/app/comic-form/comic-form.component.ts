@@ -76,12 +76,6 @@ export class ComicFormComponent implements OnChanges {
 		}
 	}
 
-	// Called when the user presses the upload button to send a file to the server
-	upload() {
-		console.log(this.selectedFile);
-		this.comicService.uploadImage(this.selectedFile).subscribe();
-	}
-
 	// This initializes our 'images' FormArray as an array of FormGroups representing the existing addresses
 	// setImages(images: Image[]) {
 	// 	// This builds an array of form groups based on the images that we have
