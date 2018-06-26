@@ -8,4 +8,6 @@ router.get('/getLatest', controller.GetLatest);
 
 router.get('/comic/:comicNum', controller.GetComic);
 
+router.get('/list', controller.GetComicNumberList);
+
 module.exports = router;

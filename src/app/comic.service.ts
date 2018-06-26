@@ -26,6 +26,9 @@ export class ComicService {
 		headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 	};
 
+	// Cache off the latest comic number and the list of comic numbers to prevent 
+	// redundant API calls
+
 	constructor(private http: HttpClient) { }
 
 	// Uploads a new comic to the server
@@ -49,6 +52,13 @@ export class ComicService {
 	getComic(comicNum: number): Observable<string> {
 		return this.http.get(this.comicUrl + '/comic/' + comicNum, {responseType: 'text'}).pipe(
 			catchError(this.handleError<string>('getComic'))
+		);
+	}
+
+	// Gets the array of released comic numbers
+	getComicList(): Observable<number[]> {
+		return this.http.get<number[]>(this.comicUrl + '/list').pipe(
+			catchError(this.handleError('Get Comic List', []))
 		);
 	}
 

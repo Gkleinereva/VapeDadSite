@@ -4,6 +4,13 @@
 			<a class="navbar-brand" href="main">VapeDad</a>
 		</div>
 
+		<!-- We need the ngIf here so that we don't get a fatal error reading from comics before it exists -->
+		<ul *ngIf="comicNumber && comics" class="nav navbar-nav">
+			<li><a href="/comic/1">First</a></li>
+			<li *ngIf="comicNumber!=1"><a href="/comic/{{comicNumber - 1}}">Previous</a></li>
+			<li *ngIf="comicNumber!=comics[comics.length - 1]"><a href="/comic/{{comicNumber + 1}}">Next</a></li>
+			<li><a href="/comic/{{comics[comics.length - 1]}}">Latest</a></li>
+		</ul>
 		<ul class="nav navbar-nav navbar-right">
 		</ul>
 	</div>

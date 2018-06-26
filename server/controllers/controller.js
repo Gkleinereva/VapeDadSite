@@ -122,8 +122,8 @@ function CompileHtml(request) {
 		//Add header giving release date at the bottom
 		html += '</div><div><p style="font-style:italic; margin:auto; width:100%;">Comic #: ' + request.body.comicNum + '; ';
 		html +=  'Release Date: ' + moment(data.releaseDate).format('MMMM Do, YYYY') + '; ';
-		html += 'Permanent Link: <a href="' + request.protocol + '://' + request.get('host') + '/' + request.body.comicNum + '">';
-		html += request.protocol + '://' + request.get('host') + '/' + request.body.comicNum + '</a></p></div>';
+		html += 'Permanent Link: <a href="' + request.protocol + '://' + request.get('host') + '/comic/' + request.body.comicNum + '">';
+		html += request.protocol + '://' + request.get('host') + '/comic/' + request.body.comicNum + '</a></p></div>';
 		console.log(moment(data.releaseDate).format('MMMM Do, YYYY HH:mm:ss'));
 
 		// Finally, write our HTML to file
@@ -150,19 +150,48 @@ exports.GetLatest = function(req, res, next) {
 		let comicIndex = numAry.length - 1;
 		let schema;
 		while(true) {
-			schema = JSON.parse(fs.readFileSync('comic_data/' + items[comicIndex] + '/schema.json', 'utf8'));
+			schema = JSON.parse(fs.readFileSync('comic_data/' + numAry[comicIndex] + '/schema.json', 'utf8'));
 
 			// Make sure the comic we found is released
 			if(schema.releaseDate < Date.now()) {
 
 				// Once we've found the latest comic, we'll read the HTML snippet and send it to the client
-				fs.readFile('comic_data/' + items[comicIndex].toString() + '/comic.html', 'utf8', (err, data) => {
+				fs.readFile('comic_data/' + numAry[comicIndex].toString() + '/comic.html', 'utf8', (err, data) => {
 					res.send(data);
 					res.end();
 				});
 				return;
 			}
 
+			comicIndex--;
+		}
+
+	});
+}
+
+// Returns an array of all released comic numbers
+exports.GetComicNumberList = function(req, res, next) {
+
+	// First, We'll read the comic_data directory to see what comic are available
+	fs.readdir('comic_data', function(err, items) {
+
+		let numAry = items.map(Number);
+		numAry.sort(function(a, b) {return a - b});
+
+		// Starting with the highest comic number, we'll pop unreleased comics until we find a released one
+		let comicIndex = numAry.length - 1;
+		let schema;
+		while(true) {
+			schema = JSON.parse(fs.readFileSync('comic_data/' + numAry[comicIndex] + '/schema.json', 'utf8'));
+
+			// If the comic we found is released, we'll return the remaining items in the array
+			if(schema.releaseDate < Date.now()) {
+
+				res.send(numAry);
+				return;
+			}
+
+			numAry.pop();
 			comicIndex--;
 		}
 
