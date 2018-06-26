@@ -9,6 +9,9 @@ import {ComicService} from '../comic.service';
 //Import our comic and image classes
 import {Comic, Image, ImageData } from '../comic';
 
+// Import the router so that we can redirect after form submission
+import { Router } from '@angular/router';
+
 @Component({
 	selector: 'app-comic-form',
 	templateUrl: './comic-form.component.html',
@@ -27,8 +30,12 @@ export class ComicFormComponent implements OnChanges {
 	// Updated to be the user's selected file whenever the user changes a file in the menus
 	selectedFile: File;
 
-	constructor(private fb: FormBuilder, private comicService: ComicService) { // <--- inject FormBuilder
-		this.createForm();
+	constructor(
+		private fb: FormBuilder, 
+		private comicService: ComicService,
+		private router: Router
+		) { // <--- inject FormBuilder
+			this.createForm();
 	}
 
 	createForm() {
@@ -48,10 +55,9 @@ export class ComicFormComponent implements OnChanges {
 	// 	this.rebuildForm();
 	// }
 
-	// rebuildForm() {
-	// 	this.comicForm.reset({});
-	// 	this.setImages(this.comic.images);
-	// }
+	rebuildForm() {
+		this.comicForm.reset({});
+	}
 
 	// This tells angular how to get the images FormArray when requested
 	get images(): FormArray {
@@ -126,6 +132,9 @@ export class ComicFormComponent implements OnChanges {
 		this.comic = this.prepareSaveComic();
 		this.comicService.addComic(this.comic).subscribe();
 		//this.rebuildForm();
+
+		// Redirect back to Admin component whenever we submit form
+		this.rebuildForm();
 	}
 
 	ngOnChanges() {

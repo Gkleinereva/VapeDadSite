@@ -16,7 +16,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 // Import our comic service
-import {ComicService} from './comic.service'
+import {ComicService} from './comic.service';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { ComicListComponent } from './comic-list/comic-list.component'
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import {ComicService} from './comic.service'
     ComicComponent,
     FooterComponent,
     AdminComponent,
-    ComicFormComponent
+    ComicFormComponent,
+    NotFoundComponent,
+    ComicListComponent
   ],
   imports: [
     BrowserModule,

@@ -11,7 +11,10 @@ import { HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 
 // catchError used for failed http requests
-import {catchError, tap} from 'rxjs/operators';
+import { catchError, tap, publishReplay, refCount} from 'rxjs/operators';
+
+// Import the router so that we can redirect when we get a failed API call
+import { Router } from '@angular/router';
 
 @Injectable({
 	providedIn: 'root'
@@ -26,16 +29,16 @@ export class ComicService {
 		headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 	};
 
-	// Cache off the latest comic number and the list of comic numbers to prevent 
-	// redundant API calls
-
-	constructor(private http: HttpClient) { }
+	constructor(
+		private http: HttpClient,
+		private router: Router
+	) { }
 
 	// Uploads a new comic to the server
 	addComic(comic: Comic): Observable<Comic> {
 		return this.http.post<Comic>(this.comicUrl + '/addComic', comic, this.httpOptions).pipe(
 			catchError(this.handleError<Comic>('addComic'))
-		);
+			);
 	}
 
 	// Asks the server for the html of the latest comic
@@ -43,7 +46,6 @@ export class ComicService {
 		// We don't need a <string> below since we're sending a header with our desired responseType
 		// I guess http.get() returns an observable, hence our  return type is still correct
 		return this.http.get(this.comicUrl + '/getLatest', {responseType: 'text'}).pipe(
-			tap(html => console.log(html)),
 			catchError(this.handleError<string>('getLatest'))
 		);
 	}
@@ -58,7 +60,14 @@ export class ComicService {
 	// Gets the array of released comic numbers
 	getComicList(): Observable<number[]> {
 		return this.http.get<number[]>(this.comicUrl + '/list').pipe(
-			catchError(this.handleError('Get Comic List', []))
+			catchError(this.handleError<number[]>('Get Comic List'))
+		);
+	}
+
+	// Gets the complete comic information for the admin page
+	getComicAdminData(): Observable<any> {
+		return this.http.get<any>(this.comicUrl + '/adminList').pipe(
+			catchError(this.handleError<any>('Get Admin List'))
 		);
 	}
 
@@ -76,6 +85,9 @@ export class ComicService {
 
 			// TODO: better job of transforming error for user consumption
 			console.log(`${operation} failed: ${error.message}`);
+
+			// Redirect to NotFound component whenever we get an API error
+			this.router.navigate(['/404']);
 
 			// Let the app keep running by returning an empty result.
 			return of(result as T);

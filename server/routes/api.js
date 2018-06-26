@@ -10,4 +10,6 @@ router.get('/comic/:comicNum', controller.GetComic);
 
 router.get('/list', controller.GetComicNumberList);
 
+router.get('/adminList', controller.GetComicAdminData);
+
 module.exports = router;

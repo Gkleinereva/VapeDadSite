@@ -139,6 +139,8 @@ function CompileHtml(request) {
 
 exports.GetLatest = function(req, res, next) {
 
+	console.log("Latest Got from API");
+
 	// First, We'll read the comic_data directory to see what comic are available
 	fs.readdir('comic_data', function(err, items) {
 
@@ -172,6 +174,8 @@ exports.GetLatest = function(req, res, next) {
 // Returns an array of all released comic numbers
 exports.GetComicNumberList = function(req, res, next) {
 
+	console.log("List Got from API");
+
 	// First, We'll read the comic_data directory to see what comic are available
 	fs.readdir('comic_data', function(err, items) {
 
@@ -195,6 +199,36 @@ exports.GetComicNumberList = function(req, res, next) {
 			comicIndex--;
 		}
 
+	});
+}
+
+//End point to return the comic list to the admin page
+exports.GetComicAdminData = function(req, res, next) {
+	// First, We'll read the comic_data directory to see what comic are available
+	fs.readdir('comic_data', function(err, items) {
+
+		let responseJson = {};
+
+		let numAry = items.map(Number);
+		numAry.sort(function(a, b) {return b - a});
+
+		//append comic numbers to response
+		responseJson.comics = numAry;
+
+		// Open the schema file of the most recently released comic
+		fs.readFile('comic_data/' + numAry[0] + '/schema.json', (err, data) => {
+			if(err) {
+				let err = new Error('Schma not found');
+				err.status = 404;
+				return next(err)
+			}
+
+			schema = JSON.parse(data);
+			responseJson.latestDate = moment(schema.releaseDate).format('MMMM Do, YYYY');
+
+			res.send(JSON.stringify(responseJson));
+			res.end();
+		});
 	});
 }
 
