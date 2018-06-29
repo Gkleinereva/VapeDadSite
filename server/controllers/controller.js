@@ -116,8 +116,8 @@ exports.AddComic = function(req, res, next) {
 
 	// End the response; handle redirect on Angular side
 	setTimeout(function() {
-		res.status(200).end();
-	}, '200');
+		res.status(200).send({message: "Comic Added!"}).end();
+	}, '50');
 }
 
 // Helper function to compile the html snippet that will be sent to Angular to display the comic
@@ -128,16 +128,17 @@ function CompileHtml(request) {
 	fs.readFile("comic_data/" + request.body.comicNum + "/schema.json", 'utf8', (err, data) => {
 		if(err) return console.log(err);
 
-		console.log(data);
-
 		// Parse our data string into JSON
 		data = JSON.parse(data);
 
-		//String to hold our HTML output
-		let html = '<div style="position:absolute;">';
-
 		// The dimension we want the images to be
 		let imgDims = 200;
+
+		//String to hold our HTML output
+		let lastImg = data.images[data.images.length - 1];
+		let lastLoc = lastImg.locations[lastImg.locations.length - 1];
+		let divHeight = (Math.floor(lastLoc/4) + 1)*imgDims + 50 + 250;
+		let html = '<div style="position:absolute;height:' + divHeight + 'px;width:' + imgDims*4 +'px;">';
 
 		let imageIndex = 0;
 		let locationIndex = 0;
@@ -146,31 +147,37 @@ function CompileHtml(request) {
 			// First add an opening <img> tag
 			html += '<img style="';
 
-			// Handle the case where we're only filling 1 block
-			if(data.images[imageIndex].locations.length == 1) {
-				html += 'width:' + imgDims + 'px;height:' + imgDims + 'px;';
-				html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
-				html += 'top:' + (imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 50) + 'px;';
-			}
-
-			// Handle the case where we have multiple blocks
-			else {
-
-				// Blocks are in a row
-				if(parseInt(data.images[imageIndex].locations[0]) + 1 ==  parseInt(data.images[imageIndex].locations[1])) {
-					html += 'width:' + imgDims*data.images[imageIndex].locations.length + 'px;height:' + imgDims + 'px;';
-					html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
-					html += 'top:' + (imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 50) + 'px;';
+			// parse the location array into a 2 dimentional array of numbers
+			var locAry = data.images[imageIndex].locations.map((item) => {return parseInt(item)});
+			var twoDLocAry = [];
+			twoDLocAry.push([]);
+			twoDLocAry[0].push(locAry[0]);
+			var locAryIndex = 1;
+			var aryIndex = 0;
+			while(locAryIndex < locAry.length) {
+				
+				// Check if the previous location and this location are in the same row
+				if(locAry[locAryIndex] == 1 + locAry[locAryIndex - 1] && twoDLocAry[aryIndex].length < 4) {
+					twoDLocAry[aryIndex].push(locAry[locAryIndex])
 				}
 
+				// Means that the image is in a new row
 				else {
-					html += 'width:' + imgDims + 'px;height:' + imgDims*data.images[imageIndex].locations.length + 'px;';
-					html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
-					html += 'top:' + (imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 50) + 'px;';
+					twoDLocAry.push([]);
+					aryIndex++;
+					twoDLocAry[aryIndex].push(locAry[locAryIndex]);
 				}
+
+				locAryIndex++;
 			}
 
-			html += 'position:absolute"'
+			// Build styling based on the twoDLocAry
+			html += 'width:' + imgDims*twoDLocAry[0].length + 'px;';
+			html += 'height:' + imgDims*twoDLocAry.length + 'px;';
+			html += 'left:' + imgDims*((data.images[imageIndex].locations[0])%4) + 'px;';
+			html += 'top:' + (imgDims*Math.floor(data.images[imageIndex].locations[0]/4) + 50) + 'px;';
+
+			html += 'position:absolute"';
 			html += ' src="/' + request.body.comicNum + '/' + data.images[imageIndex].filename + '">';
 
 			imageIndex++;
@@ -181,7 +188,6 @@ function CompileHtml(request) {
 		html +=  'Release Date: ' + moment(data.releaseDate).format('MMMM Do, YYYY') + '; ';
 		html += 'Permanent Link: <a href="' + request.protocol + '://' + request.get('host') + '/comic/' + request.body.comicNum + '">';
 		html += request.protocol + '://' + request.get('host') + '/comic/' + request.body.comicNum + '</a></p></div>';
-		console.log(moment(data.releaseDate).format('MMMM Do, YYYY HH:mm:ss'));
 
 		// Finally, write our HTML to file
 		fs.writeFile(
@@ -329,7 +335,6 @@ exports.GetComic = function(req, res, next) {
 }
 
 exports.DeleteComic = function(req, res, next) {
-	console.log("Delete Comic " + req.params.comicNum);
 	
 	//Grab the package needed to remove directories containing stuff
 	var rmdir = require('rimraf');

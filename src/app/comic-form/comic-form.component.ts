@@ -66,14 +66,11 @@ export class ComicFormComponent implements OnChanges {
 
 	// Called whenever a user changes a file in a form field
 	fileChanged(event, arrayIndex) {
-		console.log(arrayIndex);
 		let reader = new FileReader();
-		console.log(event.target.files[0]);
 		if(event.target.files && event.target.files.length > 0) {
 			let file = event.target.files[0];
 			reader.readAsDataURL(file);
 			reader.onload = () => {
-				console.log(this.comicForm.get('images'));
 				this.imageDataArray[arrayIndex] = new ImageData;
 				this.imageDataArray[arrayIndex].filename = file.name;
 				this.imageDataArray[arrayIndex].filetype = file.type;
@@ -128,7 +125,6 @@ export class ComicFormComponent implements OnChanges {
 
 	// Called by the submit button in the form automatically
 	onSubmit() {
-		console.log("Submitted");
 		this.comic = this.prepareSaveComic();
 		this.comicService.addComic(this.comic).subscribe(() => {
 			this.router.navigate(['/main']);

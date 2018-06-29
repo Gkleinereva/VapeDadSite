@@ -36,14 +36,14 @@ export class ComicService {
 	) { }
 
 	// Uploads a new comic to the server
-	addComic(comic: Comic): Observable<Comic> {
+	addComic(comic: Comic): Observable<any> {
 		return this.http.post<Comic>
 			(
 				this.comicUrl + '/addComic',
 				comic, 
 				{headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.getToken()}}
 			).pipe(
-				catchError(this.handleError<Comic>('addComic'))
+				catchError(this.handleError<any>('addComic'))
 			);
 	}
 
