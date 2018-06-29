@@ -12,6 +12,7 @@
 			<li><a href="/comic/{{comics[comics.length - 1]}}">Latest</a></li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
+			<li *ngIf="comicService.isLoggedIn()"><a (click)="comicService.logout()">Logout</a></li>
 		</ul>
 	</div>
 </nav>

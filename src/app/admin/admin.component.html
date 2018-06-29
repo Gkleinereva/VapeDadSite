@@ -1,6 +1,10 @@
 <h1>VapeDad Administration</h1>
 
-<div class="container-fluid">
+<div *ngIf="!comicService.isLoggedIn()">
+	<app-login></app-login>
+</div>
+
+<div *ngIf="comicService.isLoggedIn()" class="container-fluid">
 	<div class="row">
 
 		<div class="col-sm-3">

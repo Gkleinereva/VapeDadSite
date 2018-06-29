@@ -4,6 +4,12 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const http = require('http');
 
+//Require passport
+const passport = require('passport');
+
+// Bring in the passport configuration (If we had a model, this would be done after the model is required)
+require('./server/users/passport.js');
+
 // Routes
 const api = require('./server/routes/api');
 
@@ -18,6 +24,12 @@ app.use(express.static(path.join(__dirname, 'dist/VapeDad')));
 
 // Comic Files
 app.use(express.static(path.join(__dirname, 'comic_data')));
+
+// Other public files
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Add in passport middleware BEFORE our routes are added to the middleware chain
+app.use(passport.initialize());
 
 // API location
 app.use('/api', api);

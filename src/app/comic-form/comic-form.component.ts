@@ -130,11 +130,13 @@ export class ComicFormComponent implements OnChanges {
 	onSubmit() {
 		console.log("Submitted");
 		this.comic = this.prepareSaveComic();
-		this.comicService.addComic(this.comic).subscribe();
+		this.comicService.addComic(this.comic).subscribe(() => {
+			this.router.navigate(['/main']);
+		});
 		//this.rebuildForm();
 
-		// Redirect back to Admin component whenever we submit form
-		this.rebuildForm();
+		// Redirect back to main component whenever we submit form
+		
 	}
 
 	ngOnChanges() {

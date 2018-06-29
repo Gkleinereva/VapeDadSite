@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import{ComicService} from '../comic.service';
 
+// Import the router so that we can redirect after delete
+import { Router } from '@angular/router';
+
 @Component({
 	selector: 'app-comic-list',
 	templateUrl: './comic-list.component.html',
@@ -14,7 +17,8 @@ export class ComicListComponent implements OnInit {
 	latestReleaseDate: string;
 
 	constructor(
-		private comicService: ComicService
+		private comicService: ComicService,
+		private router: Router
 	) { }
 
 	ngOnInit() {
@@ -28,6 +32,13 @@ export class ComicListComponent implements OnInit {
 				this.comicNumbers = json.comics;
 				this.latestReleaseDate = json.latestDate;
 			});
+	}
+
+	// Deletes a comic using the button in the list
+	deleteComic(comicNum: number): void {
+		this.comicService.deleteComic(comicNum).subscribe(() => {
+			this.router.navigate(['/main']);
+		});
 	}
 
 }

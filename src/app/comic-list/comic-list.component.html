@@ -2,6 +2,6 @@
 
 <ul>
 	<li *ngFor="let number of comicNumbers">
-		<p>{{number}}</p>
+		<span>{{number}} <button class="delete" title="delete comic" (click)="deleteComic(number)">x</button></span>
 	</li>
 </ul>

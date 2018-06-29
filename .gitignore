@@ -1,5 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+# User Handling
+server/users/bin.js
+server/users/config.js
+server/users/creation.js
+
 # Test Comics
 /comic_data
 

@@ -18,26 +18,32 @@ import { HttpClientModule } from '@angular/common/http';
 // Import our comic service
 import {ComicService} from './comic.service';
 import { NotFoundComponent } from './not-found/not-found.component';
-import { ComicListComponent } from './comic-list/comic-list.component'
+import { ComicListComponent } from './comic-list/comic-list.component';
+import { LoginComponent } from './login/login.component'
+
+// Support Login Form
+import{FormsModule} from '@angular/forms';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    MenuComponent,
-    ComicComponent,
-    FooterComponent,
-    AdminComponent,
-    ComicFormComponent,
-    NotFoundComponent,
-    ComicListComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule
-  ],
-  providers: [ComicService],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		MenuComponent,
+		ComicComponent,
+		FooterComponent,
+		AdminComponent,
+		ComicFormComponent,
+		NotFoundComponent,
+		ComicListComponent,
+		LoginComponent
+	],
+	imports: [
+		BrowserModule,
+		AppRoutingModule,
+		ReactiveFormsModule,
+		HttpClientModule,
+		FormsModule
+	],
+	providers: [ComicService],
+	bootstrap: [AppComponent]
 })
 export class AppModule { }

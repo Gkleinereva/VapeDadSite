@@ -11,10 +11,13 @@ import { HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable, of} from 'rxjs';
 
 // catchError used for failed http requests
-import { catchError, tap, publishReplay, refCount} from 'rxjs/operators';
+import { catchError, tap, publishReplay, refCount, map} from 'rxjs/operators';
 
 // Import the router so that we can redirect when we get a failed API call
 import { Router } from '@angular/router';
+
+// Classes required for authentication 
+import{UserDetails, TokenResponse, TokenPayload} from './authentication-classes'
 
 @Injectable({
 	providedIn: 'root'
@@ -24,10 +27,8 @@ export class ComicService {
 	// Holds the relative URL that API calls should be directed at
 	private comicUrl = 'api';
 
-	// HTTP options for PUT and POST requests
-	private httpOptions = {
-		headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-	};
+	// Variable to store the user's token while they're authenticated
+	private token: string;
 
 	constructor(
 		private http: HttpClient,
@@ -36,8 +37,13 @@ export class ComicService {
 
 	// Uploads a new comic to the server
 	addComic(comic: Comic): Observable<Comic> {
-		return this.http.post<Comic>(this.comicUrl + '/addComic', comic, this.httpOptions).pipe(
-			catchError(this.handleError<Comic>('addComic'))
+		return this.http.post<Comic>
+			(
+				this.comicUrl + '/addComic',
+				comic, 
+				{headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.getToken()}}
+			).pipe(
+				catchError(this.handleError<Comic>('addComic'))
 			);
 	}
 
@@ -66,8 +72,22 @@ export class ComicService {
 
 	// Gets the complete comic information for the admin page
 	getComicAdminData(): Observable<any> {
-		return this.http.get<any>(this.comicUrl + '/adminList').pipe(
-			catchError(this.handleError<any>('Get Admin List'))
+		return this.http.get<any>
+			(
+				this.comicUrl + '/adminList', 
+				{headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.getToken()}}
+			).pipe(
+				catchError(this.handleError<any>('Get Admin List'))
+		);
+	}
+
+	deleteComic(comicNum: Number): Observable<Comic> {
+		return this.http.delete<Comic>
+			(
+				this.comicUrl + '/comic/' + comicNum,
+				{headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.getToken()}}
+			).pipe(
+				catchError(this.handleError<Comic>('Delete Comic'))
 		);
 	}
 
@@ -92,5 +112,69 @@ export class ComicService {
 			// Let the app keep running by returning an empty result.
 			return of(result as T);
 		};
+	}
+
+	// Token handling methods
+	private saveToken(token: string): void {
+		localStorage.setItem('mean-token', token);
+		this.token = token;
+	}
+
+	private getToken(): string {
+		if(!this.token) {
+			this.token = localStorage.getItem('mean-token');
+		}
+
+		return this.token;
+	}
+
+	public getUserDetails(): UserDetails {
+		const token = this.getToken();
+		let payload;
+		if(token) {
+			payload = token.split('.')[1];
+			payload = window.atob(payload);
+			return JSON.parse(payload);
+		}
+
+		else {
+			return null;
+		}
+	}
+
+	public isLoggedIn(): boolean {
+		const user = this.getUserDetails();
+		if(user) {
+			return user.exp > Date.now()/1000;
+		}
+
+		else {
+			return false;
+		}
+	}
+
+	public login(user: TokenPayload): Observable<any> {
+
+		// Base of login request
+		let base = this.http.post(this.comicUrl + '/login', user);
+
+		// Using .pipe(), we'll save off the token after we get the response back
+		const request = base.pipe(
+			map((data: TokenResponse) => {
+				if(data.token) {
+					this.saveToken(data.token);
+				}
+				return data;
+			}),
+			catchError(this.handleError<any>('Incorrect Login Credentials'))
+		);
+
+		return request;
+	}
+
+	public logout(): void {
+		this.token = '';
+		window.localStorage.removeItem('mean-token');
+		this.router.navigateByUrl('/main');
 	}
 }

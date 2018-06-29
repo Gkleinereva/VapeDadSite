@@ -1,8 +1,63 @@
-// Required Module for filesystem operations
+// Required Module for filesystem operations 
 var fs = require('fs');
 
 //We'll be using this to parse dates
 var moment = require('moment');
+
+//Passport module for login and such
+var passport = require('passport');
+// Helps generate a JSON Web Token (JWT)
+var jwt = require('jsonwebtoken');
+
+// Import the Secret from the config.js file
+var config = require('../users/config');
+
+exports.Login = function(req, res, next) {
+
+	//Call passport to handle authentication
+	passport.authenticate('local', function(err, user, info) {
+
+		var token;
+
+		// Check for passport error
+		if(err) {
+			let err = new Error('Incorrect Credentials');
+			err.status = 404;
+			return next(err)
+		}
+
+		//Otherwise if a user was found, generate and return a JWT
+		if(user) {
+			token = GenerateJWT(user);
+			res.status(200);
+			res.json({"token": token});
+		}
+
+		// If a user wasn't found...
+		else {
+			let err = new Error('Incorrect Credentials');
+			err.status = 404;
+			return next(err)
+		}
+
+	})(req, res, next);
+}
+
+// Helper function to generate a JWT when the user logs in
+function GenerateJWT(user) {
+	
+	// First, generate an expiration date for the token
+	let expiry = new Date();
+	expiry.setDate(expiry.getDate() + 7);
+
+	// Now generate and return a Json Web Token
+	return jwt.sign(
+		{
+			email: user.email,
+			exp: parseInt(expiry.getTime()/1000)
+		}, 
+		config.SECRET);
+}
 
 exports.AddComic = function(req, res, next) {
 
@@ -60,7 +115,9 @@ exports.AddComic = function(req, res, next) {
 		);
 
 	// End the response; handle redirect on Angular side
-	res.end();
+	setTimeout(function() {
+		res.status(200).end();
+	}, '200');
 }
 
 // Helper function to compile the html snippet that will be sent to Angular to display the comic
@@ -139,7 +196,7 @@ function CompileHtml(request) {
 
 exports.GetLatest = function(req, res, next) {
 
-	console.log("Latest Got from API");
+	// console.log("Latest Got from API");
 
 	// First, We'll read the comic_data directory to see what comic are available
 	fs.readdir('comic_data', function(err, items) {
@@ -151,7 +208,7 @@ exports.GetLatest = function(req, res, next) {
 		// find the latest released comic
 		let comicIndex = numAry.length - 1;
 		let schema;
-		while(true) {
+		while(comicIndex >= 0) {
 			schema = JSON.parse(fs.readFileSync('comic_data/' + numAry[comicIndex] + '/schema.json', 'utf8'));
 
 			// Make sure the comic we found is released
@@ -168,13 +225,15 @@ exports.GetLatest = function(req, res, next) {
 			comicIndex--;
 		}
 
+		res.status(200).send({err: "No Comics Found"}).end();
+
 	});
 }
 
 // Returns an array of all released comic numbers
 exports.GetComicNumberList = function(req, res, next) {
 
-	console.log("List Got from API");
+	// console.log("List Got from API");
 
 	// First, We'll read the comic_data directory to see what comic are available
 	fs.readdir('comic_data', function(err, items) {
@@ -185,7 +244,7 @@ exports.GetComicNumberList = function(req, res, next) {
 		// Starting with the highest comic number, we'll pop unreleased comics until we find a released one
 		let comicIndex = numAry.length - 1;
 		let schema;
-		while(true) {
+		while(comicIndex >= 0) {
 			schema = JSON.parse(fs.readFileSync('comic_data/' + numAry[comicIndex] + '/schema.json', 'utf8'));
 
 			// If the comic we found is released, we'll return the remaining items in the array
@@ -199,6 +258,8 @@ exports.GetComicNumberList = function(req, res, next) {
 			comicIndex--;
 		}
 
+		res.status(200).send({err: "No Comics Found"}).end();
+
 	});
 }
 
@@ -206,6 +267,11 @@ exports.GetComicNumberList = function(req, res, next) {
 exports.GetComicAdminData = function(req, res, next) {
 	// First, We'll read the comic_data directory to see what comic are available
 	fs.readdir('comic_data', function(err, items) {
+
+		if(items.length == 0){
+			res.status(200).send({err: "No Comics Found"}).end();
+			return;
+		}
 
 		let responseJson = {};
 
@@ -234,8 +300,6 @@ exports.GetComicAdminData = function(req, res, next) {
 
 // Gets a specific comic number and sends it to the client
 exports.GetComic = function(req, res, next) {
-	console.log("Get Comic" + req.params.comicNum);
-
 	fs.readFile('comic_data/' + req.params.comicNum + '/schema.json', (err, data) => {
 		
 		// The comic number doesn't exist
@@ -262,6 +326,25 @@ exports.GetComic = function(req, res, next) {
 			return next(err);
 		}
 	});
+}
+
+exports.DeleteComic = function(req, res, next) {
+	console.log("Delete Comic " + req.params.comicNum);
+	
+	//Grab the package needed to remove directories containing stuff
+	var rmdir = require('rimraf');
+
+	rmdir('comic_data/' + req.params.comicNum, (err) => {
+		if(err) {
+			let err = new Error('Comic to be deleted not found');
+			err.status = 404;
+			return next(err);
+		}
+	});
+
+	setTimeout(function() {
+		res.end();
+	}, '200');
 }
 
 // Can run from controllers/ with 'node controller.js CompileTest 1'
