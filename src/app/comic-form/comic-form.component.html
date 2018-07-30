@@ -17,6 +17,7 @@
 		</div>
 
 		<div formArrayName="images" class="well well-lg">
+			<!-- Having this div with a [formGroupName] is really important for formArrays to work correctly! -->
 			<div *ngFor="let image of images.controls; let i=index" [formGroupName]="i">
 				<h4>Image #{{i + 1}}</h4>
 				<div class="form-group">

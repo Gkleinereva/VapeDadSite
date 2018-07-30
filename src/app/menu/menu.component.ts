@@ -19,7 +19,7 @@ export class MenuComponent implements OnInit {
 	comicNumber: number;
 
 	constructor(
-		private comicService: ComicService,
+		public comicService: ComicService,
 		private route: ActivatedRoute
 	) { }
 

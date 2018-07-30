@@ -34,7 +34,7 @@ export class ComicFormComponent implements OnChanges {
 		private fb: FormBuilder, 
 		private comicService: ComicService,
 		private router: Router
-		) { // <--- inject FormBuilder
+		) { 
 			this.createForm();
 	}
 

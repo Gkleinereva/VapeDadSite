@@ -7,6 +7,8 @@ server/users/creation.js
 
 # Test Comics
 /comic_data
+/raw_images
+/azure_package
 
 # compiled output
 /dist

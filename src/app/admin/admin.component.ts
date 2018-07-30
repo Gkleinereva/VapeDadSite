@@ -10,7 +10,7 @@ import {ComicService} from '../comic.service';
 export class AdminComponent implements OnInit {
 
 	constructor(
-		private comicService: ComicService
+		public comicService: ComicService
 	) { }
 
 	ngOnInit() {
