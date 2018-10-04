@@ -16,3 +16,9 @@ export class ImageData {
 	filetype = '';
 	value = '';
 }
+
+export class Contact {
+	name = '';
+	email = '';
+	message = '';
+}

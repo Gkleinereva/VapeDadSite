@@ -23,6 +23,8 @@ import { LoginComponent } from './login/login.component'
 
 // Support Login Form
 import{FormsModule} from '@angular/forms';
+import { ContactComponent } from './contact/contact.component';
+import { MessageSentComponent } from './message-sent/message-sent.component';
 
 @NgModule({
 	declarations: [
@@ -34,7 +36,9 @@ import{FormsModule} from '@angular/forms';
 		ComicFormComponent,
 		NotFoundComponent,
 		ComicListComponent,
-		LoginComponent
+		LoginComponent,
+		ContactComponent,
+		MessageSentComponent
 	],
 	imports: [
 		BrowserModule,

@@ -123,7 +123,7 @@ export class ComicFormComponent implements OnChanges {
 		return saveComic;
 	}
 
-	// Called by the submit button in the form automatically
+	// Called by the specification in the form group
 	onSubmit() {
 		this.comic = this.prepareSaveComic();
 		this.comicService.addComic(this.comic).subscribe(() => {

@@ -1,19 +1,29 @@
-<nav class = "navbar navbar-inverse navbar-fixed-top">
+<nav class = "navbar navbar-dark bg-dark navbar-expand-lg fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="main">VapeDad</a>
+			<a class="navbar-brand" href="main">VapeDad Comic</a>
 		</div>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent"
+		aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
 		<!-- We need the ngIf here so that we don't get a fatal error reading from comics before it exists -->
-		<ul *ngIf="comicNumber && comics" class="nav navbar-nav">
-			<li><a href="/comic/1">First</a></li>
-			<li *ngIf="comicNumber!=1"><a href="/comic/{{comicNumber - 1}}">Previous</a></li>
-			<li *ngIf="comicNumber!=comics[comics.length - 1]"><a href="/comic/{{comicNumber + 1}}">Next</a></li>
-			<li><a href="/comic/{{comics[comics.length - 1]}}">Latest</a></li>
-		</ul>
-		<ul class="nav navbar-nav navbar-right">
-			<li *ngIf="comicService.isLoggedIn()"><a (click)="comicService.logout()">Logout</a></li>
-		</ul>
+		<div class="collapse navbar-collapse" id="navbarContent">
+			<ul *ngIf="comicNumber && comics" class="nav navbar-nav mr-auto">
+				<li class="nav-item"><a class="nav-link" href="/comic/1">First</a></li>
+				<li class="nav-item" *ngIf="comicNumber!=1"><a class="nav-link" href="/comic/{{comicNumber - 1}}">Previous</a></li>
+				<li class="nav-item" *ngIf="comicNumber!=comics[comics.length - 1]"><a class="nav-link" href="/comic/{{comicNumber + 1}}">Next</a></li>
+				<li class="nav-item"><a class="nav-link" href="/comic/{{comics[comics.length - 1]}}">Latest</a></li>
+			</ul>
+			<ul class="nav navbar-nav justify-content-end">
+				<li class="nav-item"><a class="nav-link" routerLink="/contact">Contact</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://www.facebook.com/vapedadcomic/"><img src="../assets/FB.png"></a></li>
+				<li class="nav-item"><a class="nav-link" href="https://www.instagram.com/vapedadcomic/"><img src="../assets/IG.png"></a></li>
+				<li class="nav-item" *ngIf="comicService.isLoggedIn()"><a class="nav-link" (click)="comicService.logout()">Logout</a></li>
+			</ul>
+		</div>
+
 	</div>
 </nav>
 

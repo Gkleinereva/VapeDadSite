@@ -4,6 +4,13 @@ div {
 
 .comic-container {
 	width: 800px;
+	margin-top: 75px;
+}
+
+.info-container {
+	font-style: italic;
+	margin-top: 65px;
+	width: 800px;
 }
 
 @media (max-width: 799px) {
@@ -11,23 +18,19 @@ div {
 		margin-left: 0px;
 		left: 0%;
 	}
+	.info-container {
+		margin-left: 0px;
+		left: 0%;
+	}
 }
 
 @media (min-width: 800px) {
-	.comic-container{
+	.info-container{
 		margin-left: -400px;
 		left: 50%;
 	}
-}
-
-@media (max-width: 767px) {
-	.comic-container {
-		margin-top: 242.5px;
-	}
-}
-
-@media (min-width: 768px) {
-	.comic-container {
-		margin-top: 60px;
+	.comic-container{
+		margin-left: -400px;
+		left: 50%;
 	}
 }

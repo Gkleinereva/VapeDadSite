@@ -1,0 +1,19 @@
+img {
+	display: inline-block;
+	margin-top: -5px;
+}
+
+form {
+	margin-top: 250px;
+	margin-left: 100px;
+	margin-right: 100px;
+	margin-bottom: 300px;
+}
+
+.red {
+	color: red;
+}
+
+textarea {
+	height: 200px;
+}

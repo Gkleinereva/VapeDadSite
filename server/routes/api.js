@@ -27,4 +27,10 @@ router.get('/adminList', auth ,controller.GetComicAdminData);
 
 router.delete('/comic/:comicNum', auth, controller.DeleteComic);
 
+router.get('/getLatestNumber', controller.GetLatestNumber);
+
+router.get('/comicDateAndLink/:comicNum', controller.GetComicDateAndLink);
+
+router.post('/contact', controller.Contact);
+
 module.exports = router;

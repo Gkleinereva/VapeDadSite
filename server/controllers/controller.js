@@ -12,6 +12,10 @@ var jwt = require('jsonwebtoken');
 // Import the Secret from the config.js file
 var config = require('../users/config');
 
+// Required to send email
+const nodemailer = require('nodemailer');
+
+
 exports.Login = function(req, res, next) {
 
 	//Call passport to handle authentication
@@ -90,7 +94,9 @@ exports.AddComic = function(req, res, next) {
 			req.body.imageData[imageIndex].value, 
 			'base64', 
 			function(err) {
-				console.log(err);
+				if(err) {
+					console.log(err);
+				}
 			}
 			);
 
@@ -184,10 +190,7 @@ function CompileHtml(request) {
 		}
 
 		//Add header giving release date at the bottom
-		html += '</div><div><p style="font-style:italic; margin:auto; width:100%;">Comic #: ' + request.body.comicNum + '; ';
-		html +=  'Release Date: ' + moment(data.releaseDate).format('MMMM Do, YYYY') + '; ';
-		html += 'Permanent Link: <a href="' + request.protocol + '://' + request.get('host') + '/comic/' + request.body.comicNum + '">';
-		html += request.protocol + '://' + request.get('host') + '/comic/' + request.body.comicNum + '</a></p></div>';
+		html += '</div>';
 
 		// Finally, write our HTML to file
 		fs.writeFile(
@@ -352,6 +355,94 @@ exports.DeleteComic = function(req, res, next) {
 	}, '200');
 }
 
+exports.GetLatestNumber = function(req, res, next) {
+
+	// console.log("Latest Got from API");
+
+	// First, We'll read the comic_data directory to see what comic are available
+	fs.readdir('comic_data', function(err, items) {
+
+		let numAry = items.map(Number);
+		numAry.sort(function(a, b) {return a - b});
+
+		// Starting with the highest comic number, we'll comb through the directory and 
+		// find the latest released comic
+		let comicIndex = numAry.length - 1;
+		let schema;
+		while(comicIndex >= 0) {
+			schema = JSON.parse(fs.readFileSync('comic_data/' + numAry[comicIndex] + '/schema.json', 'utf8'));
+
+			// Make sure the comic we found is released
+			if(schema.releaseDate < Date.now()) {
+
+				res.status(200).send({comicNum: numAry[comicIndex]});
+				return;
+			}
+
+			comicIndex--;
+		}
+
+		res.status(200).send({err: "No Comics Found"}).end();
+
+	});
+}
+
+exports.GetComicDateAndLink = function(req, res, next) {
+	fs.readFile('comic_data/' + req.params.comicNum + '/schema.json', (err, data) => {
+		
+		// The comic number doesn't exist
+		if(err) {
+			var err = new Error('Comic Not Found');
+			err.status = 404;
+			return next(err);
+		}
+
+		schema = JSON.parse(data);
+		
+		resJson = {};
+		resJson.date = moment(schema.releaseDate).format('MMMM Do, YYYY');
+		resJson.link = req.protocol + '://' + req.get('host') + '/comic/' + req.params.comicNum;
+
+		// The comic we're looking for has been released
+		res.send(resJson);
+	});
+}
+
+exports.Contact = function(req, res, next) {
+	console.log(req.body);
+
+	var transporter = nodemailer.createTransport({
+		host: 'server225.web-hosting.com',
+		port: 465,
+		secure: true,
+		auth: {
+			user: config.emailUserName,
+			pass: config.emailPassword
+		},
+		tls: {
+			rejectUnauthorized: false
+		}
+	});
+
+	let mailOptions = {
+		from: 'ekleiner@safebetsoftwarellc.com',
+		replyTo: req.body.email,
+		to: 'ekleiner@safebetsoftwarellc.com',
+		subject: 'Vape Dad Message!',
+		text: 'From ' + req.body.name +'(' + req.body.email + ')\n' + req.body.message
+	};
+
+	transporter.sendMail(mailOptions, (error, info) => {
+		if(error) {
+			return console.log(error);
+		}
+		console.log('Message sent: ' + info);
+	});
+
+	res.status(200).send({message: "Message Sent!"}).end();
+}
+
+
 // Can run from controllers/ with 'node controller.js CompileTest 1'
 exports.CompileTest = function(comicNum) {
 	console.log("here");
@@ -428,4 +519,5 @@ exports.CompileTest = function(comicNum) {
 }
 
 //Module used for testing
+// Note this has to be at the end of the file for it to work.
 var runnable = require('make-runnable');

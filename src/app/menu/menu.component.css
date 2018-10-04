@@ -1,8 +1,12 @@
-img{
+img {
 	display: inline-block;
-	margin-top: -10px;
+	margin-top: -5px;
 }
 
 .fix-title {
 	display: inline-block; 
+}
+
+nav {
+	width: 100%;
 }

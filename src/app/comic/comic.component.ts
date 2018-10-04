@@ -17,6 +17,10 @@ export class ComicComponent implements OnInit {
 	// Contains the html snippet delivered by the API for the current comic
 	html: SafeHtml;
 
+	relDate: string;
+
+	comicLink: string;
+
 	// Used whenever a comic number is specified from the Menu component or from a route
 	@Input() comicNumber: number;
 
@@ -39,6 +43,13 @@ export class ComicComponent implements OnInit {
 	getLatest(): void {
 		this.comicService.getLatest()
 			.subscribe(comic => this.html = this.sanitizer.bypassSecurityTrustHtml(comic));
+		this.comicService.getLatestNumber().subscribe((numberJson) => {
+			this.comicNumber = numberJson.comicNum;
+			this.comicService.getDateAndLink(this.comicNumber).subscribe((dateStringJson) => {
+				this.comicLink = dateStringJson.link;
+				this.relDate = dateStringJson.date;
+			});
+		});
 	}
 
 	// Gets a comic by the comic number
@@ -46,6 +57,10 @@ export class ComicComponent implements OnInit {
 		this.comicNumber = +this.route.snapshot.paramMap.get('comicNum');
 		this.comicService.getComic(this.comicNumber)
 			.subscribe(comic => this.html = this.sanitizer.bypassSecurityTrustHtml(comic));
+		this.comicService.getDateAndLink(this.comicNumber).subscribe((dateStringJson) => {
+			this.comicLink = dateStringJson.link;
+			this.relDate = dateStringJson.date;
+		});
 	}
 
 }

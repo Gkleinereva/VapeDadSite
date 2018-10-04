@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 // The comic class that we defined in comic.ts
-import { Comic } from './comic';
+import { Comic, Contact } from './comic';
 
 // Required to use HTTP Client
 import { HttpClient, HttpHeaders} from '@angular/common/http';
@@ -88,6 +88,24 @@ export class ComicService {
 				{headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.getToken()}}
 			).pipe(
 				catchError(this.handleError<Comic>('Delete Comic'))
+		);
+	}
+
+	getDateAndLink(comicNum: Number): Observable<any> {
+		return this.http.get(this.comicUrl + '/comicDateAndLink/' + comicNum).pipe(
+			catchError(this.handleError<any>('getDateandLink'))
+		);
+	}
+
+	getLatestNumber(): Observable<any> {
+		return this.http.get(this.comicUrl + '/getLatestNumber').pipe(
+			catchError(this.handleError<any>('get latest number'))
+		);
+	}
+
+	SendContact(contactData: Contact): Observable<Contact> {
+		return this.http.post<Contact>(this.comicUrl + '/contact', contactData).pipe(
+			catchError(this.handleError<Contact>('Contact'))
 		);
 	}
 
